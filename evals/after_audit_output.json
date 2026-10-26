@@ -1,0 +1,27 @@
+{
+  "script_audit": {
+    "script_path": "evals/fixed_pipeline_train.py",
+    "line_detections": {
+      "train_test_split_lines": [
+        25
+      ],
+      "fit_transform_lines": [],
+      "fit_resample_lines": [],
+      "fit_lines": [
+        46
+      ],
+      "transformers_detected": [],
+      "pipelines_detected": [
+        "Pipeline",
+        "ColumnTransformer",
+        "Pipeline"
+      ]
+    },
+    "critical_issues": [],
+    "warnings": [],
+    "code_leakage_issues": [],
+    "verification_passed": true
+  },
+  "code_leakage_issues": [],
+  "verification_passed": true
+}

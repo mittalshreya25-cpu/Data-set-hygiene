@@ -1,0 +1,79 @@
+{
+  "skill_name": "dataset-hygiene",
+  "version": "1.1.0",
+  "benchmark_suite": {
+    "total_cases": 3,
+    "passed_cases": 3,
+    "failed_cases": 0
+  },
+  "test_cases": [
+    {
+      "case_id": "TC_001_IMBALANCED_FRAUD_LEAKAGE_AUDIT",
+      "name": "Imbalanced Fraud Leakage Pre-Flight Audit",
+      "category": "pre_flight_data_audit",
+      "trigger_prompt": "Train a fraud detection classifier on synthetic_fraud_data.csv with is_fraud as the target.",
+      "input_dataset": "evals/synthetic_fraud_data.csv",
+      "target_column": "is_fraud",
+      "expected_flags": [
+        "HIGH_CARDINALITY_ID_COLUMN",
+        "TEMPORAL_COLUMN_DETECTED",
+        "SEVERE_CLASS_IMBALANCE",
+        "SUSPECTED_TARGET_PROXY_LEAKAGE",
+        "MISSING_VALUE_COLUMNS"
+      ],
+      "detected_flags": {
+        "id_column": "transaction_id",
+        "temporal_column": "timestamp",
+        "class_imbalance": "96% legit vs 4% fraud (minority ratio 0.04 < 0.15)",
+        "target_proxy": "chargeback_approved_flag (abs Pearson correlation = 0.9872 > 0.95)",
+        "missing_values": "income (50 rows, 5.0%)"
+      },
+      "remediation_enforced": [
+        "Drop transaction_id and timestamp before training",
+        "Drop chargeback_approved_flag due to post-event leakage",
+        "Enforce stratified split (stratify=y)",
+        "Mandate PR-AUC and ROC-AUC evaluation instead of raw accuracy"
+      ],
+      "status": "PASSED"
+    },
+    {
+      "case_id": "TC_002_PRE_SPLIT_SCALING_REFACTOR",
+      "name": "Pre-Split Scaling and Transformer Contamination Refactor",
+      "category": "ast_code_leakage_detection",
+      "trigger_prompt": "Audit and fix evals/bad_baseline_train.py to ensure zero data leakage in production.",
+      "input_script": "evals/bad_baseline_train.py",
+      "output_script": "evals/fixed_pipeline_train.py",
+      "expected_critical_issues": [
+        "PRE_SPLIT_DATA_LEAKAGE",
+        "UNSAFE_STANDALONE_TRANSFORMER"
+      ],
+      "expected_warnings": [
+        "MISSING_STRATIFICATION",
+        "ACCURACY_TRAP_RISK"
+      ],
+      "before_status": {
+        "critical_issues_count": 2,
+        "warnings_count": 2,
+        "verification_passed": false
+      },
+      "after_status": {
+        "critical_issues_count": 0,
+        "warnings_count": 0,
+        "verification_passed": true
+      },
+      "remediation_applied": "Refactored preprocessing into ColumnTransformer and encapsulated estimator into Pipeline; added stratify=y and multi-metric imbalanced evaluation.",
+      "status": "PASSED"
+    },
+    {
+      "case_id": "TC_003_NEGATIVE_TRIGGER_UI_TEST",
+      "name": "Negative Trigger Non-ML Workflow Rejection",
+      "category": "negative_trigger_rejection",
+      "trigger_prompt": "Create a responsive React navigation bar with dark mode toggle using Tailwind CSS.",
+      "expected_behavior": "Skill should NOT activate. No tabular data or ML script involved.",
+      "activation_condition_met": false,
+      "skill_action": "REJECT_ACTIVATION",
+      "token_overhead_saved": "100%",
+      "status": "PASSED"
+    }
+  ]
+}

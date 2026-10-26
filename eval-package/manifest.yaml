@@ -1,0 +1,19 @@
+version: "1.0"
+metadata:
+  name: dataset-hygiene-eval
+  id: dataset-hygiene-eval
+  description: Evaluation suite for dataset-hygiene skill measuring data leakage detection, pre-split scaling prevention, and identifier memorization.
+  author: shreya-mittal
+  license: MIT
+  tags:
+    - data-science
+    - machine-learning
+dataset:
+  format: jsonl
+  file_path: dataset.jsonl
+  features:
+    input: input
+    expected_output: expected_output
+    context: context
+evaluation_type:
+  method: contains

@@ -1,0 +1,108 @@
+{
+  "dataset_audit": {
+    "rows": 1000,
+    "columns": 7,
+    "missing_cells_total": 50,
+    "flags": {
+      "HIGH_CARDINALITY_ID_COLUMN": [
+        {
+          "column": "transaction_id",
+          "unique_values": 1000,
+          "total_rows": 1000,
+          "reason": "100% unique values"
+        },
+        {
+          "column": "timestamp",
+          "unique_values": 1000,
+          "total_rows": 1000,
+          "reason": "100% unique values"
+        }
+      ],
+      "CONSTANT_ZERO_VARIANCE_COLUMN": [],
+      "TEMPORAL_COLUMN_DETECTED": [
+        "timestamp"
+      ],
+      "SEVERE_CLASS_IMBALANCE": {
+        "is_severe": true,
+        "target_column": "is_fraud",
+        "minority_class_ratio": 0.04,
+        "class_distribution": {
+          "0": 0.96,
+          "1": 0.04
+        },
+        "threshold": 0.15
+      },
+      "SUSPECTED_TARGET_PROXY_LEAKAGE": [
+        {
+          "column": "chargeback_approved_flag",
+          "correlation": 0.9872,
+          "warning": "Absolute Pearson correlation > 0.95 with target"
+        }
+      ],
+      "MISSING_VALUE_COLUMNS": [
+        {
+          "column": "income",
+          "missing_count": 50,
+          "missing_percentage": 5.0
+        }
+      ]
+    }
+  },
+  "script_audit": {
+    "script_path": "evals/bad_baseline_train.py",
+    "line_detections": {
+      "train_test_split_lines": [
+        26
+      ],
+      "fit_transform_lines": [
+        23
+      ],
+      "fit_resample_lines": [],
+      "fit_lines": [
+        32
+      ],
+      "transformers_detected": [
+        "StandardScaler"
+      ],
+      "pipelines_detected": []
+    },
+    "critical_issues": [
+      {
+        "type": "PRE_SPLIT_DATA_LEAKAGE",
+        "severity": "CRITICAL",
+        "line": 23,
+        "description": ".fit_transform() called on line 23 before train_test_split() on line 26."
+      },
+      {
+        "type": "UNSAFE_STANDALONE_TRANSFORMER",
+        "severity": "CRITICAL",
+        "line": 23,
+        "description": "Standalone transformer 'scaler' called .fit_transform() on line 23 outside of Pipeline or ColumnTransformer."
+      }
+    ],
+    "warnings": [
+      {
+        "type": "MISSING_STRATIFICATION",
+        "severity": "WARNING",
+        "line": 26,
+        "description": "train_test_split() at line 26 called without 'stratify=' parameter."
+      },
+      {
+        "type": "ACCURACY_TRAP_RISK",
+        "severity": "WARNING",
+        "line": null,
+        "description": "accuracy_score is imported/used without robust imbalanced metrics (roc_auc_score, average_precision_score, f1_score)."
+      }
+    ],
+    "code_leakage_issues": [
+      "PRE_SPLIT_DATA_LEAKAGE",
+      "UNSAFE_STANDALONE_TRANSFORMER"
+    ],
+    "verification_passed": false
+  },
+  "code_leakage_issues": [
+    "PRE_SPLIT_DATA_LEAKAGE",
+    "UNSAFE_STANDALONE_TRANSFORMER"
+  ],
+  "verification_passed": false
+}
